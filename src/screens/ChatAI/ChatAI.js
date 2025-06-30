@@ -1,31 +1,35 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
+import { GoogleGenAI } from "@google/genai";
 
 const GEMINI_API_KEY = 'AIzaSyCNALbZ2C3yauAL1stbKyEtIWMySgn10T0';
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + GEMINI_API_KEY;
+
+const ai = new GoogleGenAI({
+  apiKey: GEMINI_API_KEY,
+});
 
 async function fetchGeminiResponse(userMessage) {
-  const body = {
-    contents: [
-      { parts: [{ text: userMessage }] }
-    ]
-  };
   try {
-    const res = await fetch(GEMINI_API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.0-flash-001',
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            {
+              text: `Bạn là một trợ lý AI chuyên về giải Ngoại hạng Anh (Premier League). Trả lời ngắn gọn, dễ hiểu, và chính xác theo dữ liệu mới nhất. Dưới đây là câu hỏi của tôi: "${userMessage}"`,
+            },
+          ],
+        },
+      ],
     });
-    const data = await res.json();
-    if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
-      return data.candidates[0].content.parts[0].text;
-    } else {
-      return 'Xin lỗi, tôi không thể trả lời lúc này.';
-    }
+    return response.text;
   } catch (e) {
+    console.log(e);
     return 'Đã xảy ra lỗi khi kết nối Gemini.';
   }
 }
+
 
 const ChatAI = () => {
   const [messages, setMessages] = useState([
@@ -81,7 +85,7 @@ const ChatAI = () => {
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={80}
+      keyboardVerticalOffset={0}
     >
       <View style={styles.header}>
         <Text style={styles.headerText}>AI Chat</Text>
@@ -134,16 +138,16 @@ const ChatAI = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fff',
   },
   header: {
     paddingTop: 50,
     paddingBottom: 16,
-    backgroundColor: '#4f8cff',
+    backgroundColor: '#fff',
     alignItems: 'center',
   },
   headerText: {
-    color: '#fff',
+    color: '#111',
     fontSize: 22,
     fontWeight: 'bold',
   },
@@ -158,15 +162,15 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   userMessage: {
-    backgroundColor: '#4f8cff',
+    backgroundColor: '#111',
     alignSelf: 'flex-end',
   },
   aiMessage: {
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#f5f5f5',
     alignSelf: 'flex-start',
   },
   messageText: {
-    color: '#222',
+    color: '#111',
     fontSize: 16,
   },
   inputContainer: {
@@ -174,20 +178,23 @@ const styles = StyleSheet.create({
     padding: 12,
     backgroundColor: '#fff',
     borderTopWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#eee',
+    marginBottom: 0,
+    paddingBottom: 12,
   },
   input: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#eee',
     borderRadius: 20,
     paddingHorizontal: 16,
     fontSize: 16,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#fff',
+    color: '#111',
   },
   sendButton: {
     marginLeft: 8,
-    backgroundColor: '#4f8cff',
+    backgroundColor: '#111',
     borderRadius: 20,
     paddingVertical: 10,
     paddingHorizontal: 18,
@@ -203,19 +210,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingVertical: 8,
     paddingHorizontal: 8,
-    backgroundColor: '#f0f4ff',
+    backgroundColor: '#f5f5f5',
     borderBottomWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: '#eee',
   },
   suggestionButton: {
-    backgroundColor: '#e6edff',
+    backgroundColor: '#eaeaea',
     borderRadius: 16,
     paddingVertical: 8,
     paddingHorizontal: 14,
     marginRight: 8,
   },
   suggestionText: {
-    color: '#4f8cff',
+    color: '#111',
     fontSize: 15,
   },
 });

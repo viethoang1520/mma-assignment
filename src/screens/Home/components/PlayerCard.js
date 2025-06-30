@@ -3,11 +3,11 @@ import React from 'react'
 import { useNavigation } from '@react-navigation/native'
 import AntDesign from '@expo/vector-icons/AntDesign';
 
-export default function PlayerCard({ player, toggleFavorites, isFavorite }) {
+export default function PlayerCard({ player, toggleFavorites, isFavorite, disableDetails }) {
   const navigation = useNavigation()
   return (
     <>
-      <Pressable onPress={() => navigation.navigate('Detail', { playerId: player.id })} style={{ width: '100%', height: '100%', position: 'relative' }}>
+      <Pressable onPress={disableDetails ? null : () => navigation.navigate('Detail', { playerId: player.id })} style={{ width: '100%', height: '100%', position: 'relative' }}>
         <Image
           source={{ uri: player.image }}
           style={{ width: '100%', height: '75%', }}
