@@ -77,7 +77,10 @@ const ChatAI = () => {
 
   const renderItem = ({ item }) => (
     <View style={[styles.messageContainer, item.sender === 'user' ? styles.userMessage : styles.aiMessage]}>
-      <Text style={styles.messageText}>{item.text}</Text>
+      <Text style={[
+        styles.messageText,
+        item.sender === 'user' ? { color: '#fff' } : { color: '#111' }
+      ]}>{item.text}</Text>
     </View>
   );
 
@@ -170,7 +173,6 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   messageText: {
-    color: '#111',
     fontSize: 16,
   },
   inputContainer: {
@@ -181,16 +183,6 @@ const styles = StyleSheet.create({
     borderColor: '#eee',
     marginBottom: 0,
     paddingBottom: 12,
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#eee',
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    fontSize: 16,
-    backgroundColor: '#fff',
-    color: '#111',
   },
   sendButton: {
     marginLeft: 8,
@@ -224,6 +216,16 @@ const styles = StyleSheet.create({
   suggestionText: {
     color: '#111',
     fontSize: 15,
+  },
+  input: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#eee',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    backgroundColor: '#fff',
+    color: '#111',
   },
 });
 
