@@ -1,14 +1,13 @@
 import { View, Text, Image, Pressable, Button } from 'react-native'
-import React, { useState } from 'react'
+import React from 'react'
 import { useNavigation } from '@react-navigation/native'
 import AntDesign from '@expo/vector-icons/AntDesign';
 
-export default function PlayerCard({ player, toggleFavorites }) {
+export default function PlayerCard({ player, toggleFavorites, isFavorite }) {
   const navigation = useNavigation()
-  const [like, setLike] = useState(false)
   return (
     <>
-      <Pressable onPress={() => navigation.navigate('Detail')} style={{ width: '100%', height: '100%', position: 'relative' }}>
+      <Pressable onPress={() => navigation.navigate('Detail', { playerId: player.id })} style={{ width: '100%', height: '100%', position: 'relative' }}>
         <Image
           source={{ uri: player.image }}
           style={{ width: '100%', height: '75%', }}
@@ -19,7 +18,6 @@ export default function PlayerCard({ player, toggleFavorites }) {
           <Text style={{ fontWeight: 'bold' }}>{player.playerName}</Text>
           <Text style={{ color: '#4d4d4d', }}>Nominee in {player.team}</Text>
           <Text style={{ fontWeight: 'bold' }}>{player.position}</Text>
-
         </View>
       </Pressable>
       <View
@@ -28,12 +26,8 @@ export default function PlayerCard({ player, toggleFavorites }) {
           padding: 5, width: 34, height: 34, backgroundColor: 'white',
           display: 'flex', justifyContent: 'center', alignItems: 'center'
         }}>
-        <Pressable onPress={() => {
-          setLike(!like)
-          toggleFavorites(player)
-        }}
-          hitSlop={10}>
-          <AntDesign name={like ? "heart" : 'hearto'} size={18} color={like ? "red" : 'black'} />
+        <Pressable onPress={() => toggleFavorites(player)} hitSlop={10}>
+          <AntDesign name={isFavorite ? "heart" : 'hearto'} size={18} color={isFavorite ? "red" : 'black'} />
         </Pressable>
       </View>
     </>

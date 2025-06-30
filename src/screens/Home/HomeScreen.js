@@ -1,31 +1,42 @@
 import { View, Text, SafeAreaView, StyleSheet, ScrollView, Button } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import NationFilter from './components/NationFilter'
 // import { playerList } from '../../data/playerList.js'
 import PlayerCard from './components/PlayerCard.js'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useFocusEffect } from '@react-navigation/native'
 import axios from 'axios'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+
 export default function HomeScreen() {
   const navigation = useNavigation()
   const [playerList, setPlayerList] = useState([])
   const [favorites, setFavorites] = useState([])
+  const [selectedCountry, setSelectedCountry] = useState('')
+
   const fetchPlayerList = async () => {
     try {
       const response = await axios.get(process.env.EXPO_PUBLIC_API_URL)
       setPlayerList(response.data)
-      // console.log(response.data)
     } catch (error) {
       console.log(error)
     }
   }
 
+  const fetchFilteredPlayers = async () => {
+    try {
+      const response = await axios.get(process.env.EXPO_PUBLIC_API_URL + `?team=${selectedCountry}`)
+      setPlayerList(response.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
   const fetchFavoritePlayers = async () => {
     try {
       const storage = await AsyncStorage.getItem("favorites")
       if (storage) {
         setFavorites(JSON.parse(storage))
-        console.log(storage)
+      } else {
+        setFavorites([])
       }
     } catch (error) {
       console.log(error)
@@ -33,16 +44,30 @@ export default function HomeScreen() {
   }
 
   useEffect(() => {
-    fetchPlayerList(),
-    fetchFavoritePlayers()
-  }, [])
+    fetchPlayerList();
+    fetchFavoritePlayers();
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchFavoritePlayers();
+    }, [])
+  );
+
+  useEffect(() => {
+    if (selectedCountry) {
+      fetchFilteredPlayers()
+    } else {
+      fetchPlayerList()
+    }
+  }, [selectedCountry])
 
   const handleToggleFavorite = async (player) => {
     try {
-      let updatedFav 
-      const isAddedToFav = favorites.some((fav) => { fav.id === player.id })
+      let updatedFav
+      const isAddedToFav = favorites.some((fav) => fav.id === player.id)
       if (isAddedToFav) {
-        updatedFav = favorites.filter((fav) => {fav.id !== player.id})
+        updatedFav = favorites.filter((fav) => fav.id !== player.id)
       } else {
         updatedFav = [...favorites, player]
       }
@@ -59,7 +84,10 @@ export default function HomeScreen() {
       <ScrollView style={styles.container}>
         <View style={{ marginTop: 60 }}>
           <Text style={styles.text}> FIFA Best Players 2025</Text>
-          <NationFilter />
+          <NationFilter
+            selectedCountry={selectedCountry}
+            setSelectedCountry={setSelectedCountry}
+          />
           <View style={{
             display: 'flex', flexDirection: 'row', flexWrap: 'wrap',
             justifyContent: 'space-between', marginTop: 10, paddingVertical: 10,
@@ -70,6 +98,7 @@ export default function HomeScreen() {
                 <PlayerCard
                   player={player}
                   toggleFavorites={handleToggleFavorite}
+                  isFavorite={favorites.some(fav => fav.id === player.id)}
                 />
               </View>
             ))}
