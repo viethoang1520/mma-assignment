@@ -72,6 +72,12 @@ export default function HomeScreen() {
       const isAddedToFav = favorites.some((fav) => fav.id === player.id)
       if (isAddedToFav) {
         updatedFav = favorites.filter((fav) => fav.id !== player.id)
+        Toast.show({
+          type: 'success',
+          text1: 'Đã bỏ khỏi danh sách yêu thích!',
+          position: 'bottom',
+          bottomOffset: 85
+        });
       } else {
         updatedFav = [...favorites, player]
         Toast.show({
