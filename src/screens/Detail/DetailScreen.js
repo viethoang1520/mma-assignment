@@ -135,7 +135,6 @@ export default function DetailScreen({ route }) {
                 )
               })}
             </View>
-            
           </>
         )}
         <Text style={{ fontWeight: '500', fontSize: 20, paddingBottom: 20, paddingTop: 20 }}>Reviews ({player?.feedbacks.length})</Text>

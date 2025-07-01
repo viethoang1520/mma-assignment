@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView, StyleSheet, ScrollView, Button, TouchableOpacity, Pressable } from 'react-native'
+import { View, Text, SafeAreaView, StyleSheet, ScrollView, Button, TouchableOpacity, Pressable, Alert } from 'react-native'
 import React, { useEffect, useState, useCallback } from 'react'
 import NationFilter from '../Home/components/NationFilter'
 import PlayerCard from '../Home/components/PlayerCard.js'
@@ -52,15 +52,33 @@ export default function FavoriteScreen() {
   }
 
   const handleDeleteSelected = async () => {
-    try {
-      const selectedIds = selectedPlayers.map(p => p.id)
-      const updatedFavorites = favorites.filter(player => !selectedIds.includes(player.id))
-      setFavorites(updatedFavorites)
-      await AsyncStorage.setItem("favorites", JSON.stringify(updatedFavorites))
-      handleCancelSelection()
-    } catch (error) {
-      console.log(error)
-    }
+    const count = selectedPlayers.length;
+    Alert.alert(
+      'Xác nhận xóa',
+      `Bạn muốn xóa ${count} cầu thủ?`,
+      [
+        {
+          text: 'Hủy',
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: async () => {
+            try {
+              const selectedIds = selectedPlayers.map(p => p.id)
+              const updatedFavorites = favorites.filter(player => !selectedIds.includes(player.id))
+              setFavorites(updatedFavorites)
+              await AsyncStorage.setItem("favorites", JSON.stringify(updatedFavorites))
+              handleCancelSelection()
+            } catch (error) {
+              console.log(error)
+            }
+          },
+          style: 'destructive',
+        },
+      ],
+      { cancelable: true }
+    );
   }
 
   useFocusEffect(
